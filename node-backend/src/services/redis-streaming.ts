@@ -115,6 +115,7 @@ class RedisStreamService {
 
 							if (status === "done" && fullContent) {
 								const aiMsgId = session.messageId;
+								console.log("full response", { fullContent });
 								// console.log(`Finalizing message ${correlationId} for DB...`);
 
 								// DATA OWNER: Save the Assistant's response to Postgres/Guest Storage
