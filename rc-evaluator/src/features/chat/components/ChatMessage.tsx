@@ -9,6 +9,7 @@ interface ChatMessageProps {
 	message: any;
 	isAssistant: boolean;
 	textToShow: string;
+	isStreaming?: boolean;
 	onEvaluate?: (evaluation: MessageReviewType) => void;
 }
 
@@ -26,11 +27,12 @@ export const ChatMessage = ({
 	isAssistant,
 	textToShow,
 	onEvaluate,
+	isStreaming,
 }: ChatMessageProps) => {
 	// --- Robust Streaming Drip Logic ---
-	const [displayedText, setDisplayedText] = useState(isAssistant ? "" : textToShow);
+	const [displayedText, setDisplayedText] = useState((isAssistant && isStreaming) ? "" : textToShow);
 	const fullTextRef = useRef(textToShow);
-	const indexRef = useRef(isAssistant ? 0 : textToShow.length);
+	const indexRef = useRef((isAssistant && isStreaming) ? 0 : textToShow.length);
 	const requestRef = useRef<number | null>(null);
 
 	// Sync ref whenever textToShow changes from parent
@@ -40,8 +42,10 @@ export const ChatMessage = ({
 
 	useEffect(() => {
 		// Non-assistant messages show instantly
-		if (!isAssistant) {
+		// Assistant messages already in history show instantly
+		if (!isAssistant || !isStreaming) {
 			setDisplayedText(textToShow);
+			indexRef.current = textToShow.length;
 			return;
 		}
 
@@ -86,8 +90,8 @@ export const ChatMessage = ({
 				<div className="flex flex-col items-center gap-3">
 					<div
 						className={`flex-shrink-0 w-9 h-9 rounded-lg flex items-center justify-center border shadow-xl ${isAssistant
-								? "bg-[#030712] border-blue-500/30 text-blue-400"
-								: "bg-zinc-900 border-white/10 text-zinc-400"
+							? "bg-[#030712] border-blue-500/30 text-blue-400"
+							: "bg-zinc-900 border-white/10 text-zinc-400"
 							}`}
 					>
 						{isAssistant ? <Terminal size={18} /> : <Code2 size={18} />}
@@ -126,7 +130,7 @@ export const ChatMessage = ({
 
 					{/* Action Area for Assistant */}
 					{isAssistant && onEvaluate && (
-						<div className="mt-8 pt-6 border-t border-white/[0.05] w-full max-w-md">
+						<div className="mt-2 border-white/[0.05] w-full max-w-md">
 							<MessageReview
 								initialRating={message.rating}
 								initialComment={message.evaluationComment}
