@@ -35,11 +35,10 @@ export const MessageReview: React.FC<MessageReviewProps> = ({
 						<Star
 							key={star}
 							size={12}
-							className={`${
-								star <= rating
+							className={`${star <= rating
 									? "fill-yellow-500 text-yellow-500"
 									: "text-zinc-600"
-							}`}
+								}`}
 						/>
 					))}
 				</div>
@@ -75,30 +74,31 @@ export const MessageReview: React.FC<MessageReviewProps> = ({
 						>
 							<Star
 								size={14}
-								className={`${
-									star <= rating
+								className={`${star <= rating
 										? "fill-yellow-500 text-yellow-500"
 										: "text-zinc-600 hover:text-zinc-400"
-								}`}
+									}`}
 							/>
 						</button>
 					))}
 				</div>
 
 				{rating > 0 && (
-					<div className="flex gap-2 items-end animate-in fade-in slide-in-from-top-2 duration-200">
-						<Textarea
-							value={comment}
-							onChange={(e) => setComment(e.target.value)}
-							placeholder="Optional feedback..."
-							className="min-h-[60px] text-xs bg-black/20 border-white/10 focus:border-white/20 resize-none p-2"
-						/>
-						<button
-							onClick={handleSubmit}
-							className="h-[60px] w-[30px] flex items-center justify-center rounded-md bg-white/10 hover:bg-white/20 text-zinc-300 transition-colors"
-						>
-							<Send size={14} />
-						</button>
+					<div className="relative group animate-in fade-in slide-in-from-top-2 duration-200">
+						<div className="relative flex items-end bg-black/30 border border-white/10 rounded-xl p-1.5 focus-within:border-white/20 transition-all">
+							<Textarea
+								value={comment}
+								onChange={(e) => setComment(e.target.value)}
+								placeholder="Optional feedback..."
+								className="flex-1 min-h-[60px] max-h-[120px] text-[11px] bg-transparent border-none focus-visible:ring-0 resize-none py-2 px-3 text-zinc-300 placeholder:text-zinc-600"
+							/>
+							<button
+								onClick={handleSubmit}
+								className="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg bg-white/5 hover:bg-white/10 text-zinc-400 hover:text-white transition-all active:scale-95 mb-1 mr-1"
+							>
+								<Send size={12} />
+							</button>
+						</div>
 					</div>
 				)}
 			</div>
