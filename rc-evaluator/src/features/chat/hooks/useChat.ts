@@ -86,6 +86,12 @@ export const useChat = (initialConversations: Conversation[] = []) => {
 
 	// 2. Local creation (Optimistic)
 	const createNewConversation = useCallback(() => {
+		const existingEmpty = conversations.find((c) => c.messages.length === 0);
+		if (existingEmpty) {
+			setActiveId(existingEmpty.id);
+			return;
+		}
+
 		const newConv: Conversation = {
 			id: `temp-${crypto.randomUUID()}`,
 			title: "New Conversation",
@@ -95,7 +101,7 @@ export const useChat = (initialConversations: Conversation[] = []) => {
 		};
 		setConversations((prev) => [newConv, ...prev]);
 		setActiveId(newConv.id);
-	}, []);
+	}, [conversations]);
 
 	const sendMessage = async (text: string) => {
 		if (!user?.id || !text.trim()) return;
@@ -158,10 +164,10 @@ export const useChat = (initialConversations: Conversation[] = []) => {
 								// Replace our optimistic message with the real one from DB
 								m.id === optimisticMsg.id
 									? {
-											...m,
-											id: envelope.id,
-											correlationId: envelope.correlationId,
-										}
+										...m,
+										id: envelope.id,
+										correlationId: envelope.correlationId,
+									}
 									: m,
 							),
 						};
