@@ -10,6 +10,7 @@ export const useChat = (initialConversations: Conversation[] = []) => {
 	const [conversations, setConversations] =
 		useState<Conversation[]>(initialConversations);
 	const [activeId, setActiveId] = useState<string | null>(null);
+	const [isStreaming, setIsStreaming] = useState(false);
 	const { socket, isConnected } = useSocket();
 
 	const activeConversation = conversations.find((c) => c.id === activeId);
@@ -38,7 +39,8 @@ export const useChat = (initialConversations: Conversation[] = []) => {
 		if (!socket) return;
 
 		// Listen for AI response chunks from Redis via Node
-		socket.on("ai_chunk", ({ conversationId, messageId, chunk }) => {
+		socket.on("ai_chunk", ({ conversationId, messageId, chunk, isLast }) => {
+			if (isLast) setIsStreaming(false);
 			setConversations((prev) =>
 				prev.map((conv) => {
 					if (conv.id === conversationId) {
@@ -77,8 +79,13 @@ export const useChat = (initialConversations: Conversation[] = []) => {
 			);
 		});
 
+		socket.on("ai_complete", () => {
+			setIsStreaming(false);
+		});
+
 		return () => {
 			socket.off("ai_chunk");
+			socket.off("ai_complete");
 		};
 	}, [socket]);
 
@@ -186,6 +193,7 @@ export const useChat = (initialConversations: Conversation[] = []) => {
 
 	const sendMessageToSocket = async (text: string) => {
 		if (!user?.id || !text.trim() || !isConnected) return;
+		setIsStreaming(true);
 		const isNewChat = !activeId || activeId.startsWith("temp-");
 		const tempId = activeId || `temp-${crypto.randomUUID()}`;
 		const senderRole = "user";
@@ -256,6 +264,13 @@ export const useChat = (initialConversations: Conversation[] = []) => {
 		);
 	};
 
+	const stopStreaming = useCallback(() => {
+		if (socket && isStreaming) {
+			socket.emit("stop_chat", { conversationId: activeId });
+			setIsStreaming(false);
+		}
+	}, [socket, isStreaming, activeId]);
+
 	return {
 		conversations,
 		activeConversation,
@@ -263,5 +278,7 @@ export const useChat = (initialConversations: Conversation[] = []) => {
 		sendMessageToSocket,
 		createNewConversation,
 		setActiveId,
+		isStreaming,
+		stopStreaming,
 	};
 };

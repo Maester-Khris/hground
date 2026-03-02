@@ -13,6 +13,8 @@ export const ChatContainer = () => {
 		sendMessageToSocket,
 		createNewConversation,
 		setActiveId,
+		isStreaming,
+		stopStreaming,
 	} = useChat([]);
 	const { sendEvaluationToSocket } = useAIReview();
 
@@ -32,8 +34,13 @@ export const ChatContainer = () => {
 				<ChatWindow.Messages
 					messages={activeConversation?.messages || []}
 					onEvaluate={sendEvaluationToSocket}
+					isStreaming={isStreaming}
 				/>
-				<ChatWindow.Input onSubmit={sendMessageToSocket} />
+				<ChatWindow.Input
+					onSubmit={sendMessageToSocket}
+					isStreaming={isStreaming}
+					onStop={stopStreaming}
+				/>
 			</ChatWindow>
 			<AuthModal />
 		</MainLayout>
