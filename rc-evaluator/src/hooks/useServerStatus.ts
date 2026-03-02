@@ -7,6 +7,8 @@ interface ServerStatusState {
         redis: string;
         pythonServer: string;
     };
+    refreshTrigger: number;
+    triggerRefresh: () => void;
     setAvailable: (available: boolean, dependencies?: any) => void;
 }
 
@@ -17,6 +19,8 @@ export const useServerStatus = create<ServerStatusState>((set) => ({
         redis: "unknown",
         pythonServer: "unknown",
     },
+    refreshTrigger: 0,
+    triggerRefresh: () => set((state) => ({ refreshTrigger: state.refreshTrigger + 1 })),
     setAvailable: (available, dependencies) =>
         set({
             isAvailable: available,

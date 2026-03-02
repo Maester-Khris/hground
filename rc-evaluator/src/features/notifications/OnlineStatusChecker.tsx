@@ -10,6 +10,7 @@ export const OnlineStatusChecker = () => {
 	const { isOffline } = useOnlineStatus();
 	const { show, clear } = useNotification();
 	const setAvailable = useServerStatus((state) => state.setAvailable);
+	const refreshTrigger = useServerStatus((state) => state.refreshTrigger);
 
 	const lastStatus = useRef<"active" | "degraded" | "unknown">("unknown");
 	const backoffDelay = useRef(5000);
@@ -59,7 +60,7 @@ export const OnlineStatusChecker = () => {
 			return;
 		}
 
-		// Trigger check on mount or when coming back online
+		// Trigger check on mount or when coming back online or when manually triggered
 		checkBackend();
 
 		// Re-validate when user returns to tab (Lazy Validation)
@@ -72,7 +73,7 @@ export const OnlineStatusChecker = () => {
 			if (timerRef.current) clearTimeout(timerRef.current);
 			window.removeEventListener("focus", handleFocus);
 		};
-	}, [isOffline, checkBackend, show, setAvailable]);
+	}, [isOffline, checkBackend, show, setAvailable, refreshTrigger]);
 
 	return null;
 };
