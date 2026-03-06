@@ -6,6 +6,8 @@ import { PublicLayout } from "@/layouts/PublicLayout";
 import { DocsPage } from "@/pages/landing/DocsPage";
 import { FeaturesPage } from "@/pages/landing/FeaturesPage";
 import { HomePage } from "@/pages/landing/HomePage";
+import { ArchitecturePage } from "@/pages/landing/ArchitecturePage";
+import { RLHFPage } from "@/pages/landing/RLHFPage";
 
 export const AppRouter = () => {
 	return (
@@ -17,6 +19,8 @@ export const AppRouter = () => {
 					<Route path="/" element={<HomePage />} />
 					<Route path="/features" element={<FeaturesPage />} />
 					<Route path="/docs" element={<DocsPage />} />
+					<Route path="/docs/architecture" element={<ArchitecturePage />} />
+					<Route path="/docs/rlhf" element={<RLHFPage />} />
 				</Route>
 
 				{/* Protected/App Routes - Gated with Status Checker */}

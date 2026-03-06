@@ -72,7 +72,8 @@
 //     );
 // };
 
-import { GitBranch, Zap, Cpu, ShieldCheck, FileText } from "lucide-react";
+import { GitBranch, Zap, Cpu, ShieldCheck, FileText, ArrowUpRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { SEO } from "../../common/components/SEO";
 import { Footer } from "@/features/marketing/components/Footer";
 
@@ -86,30 +87,35 @@ const ASSETS = {
 };
 
 export const DocsPage = () => {
+    const navigate = useNavigate();
     const deepDives = [
         {
             title: "Distributed Pipeline",
             icon: <GitBranch className="text-blue-400" />,
             content: "Implementation of a non-blocking I/O orchestrator utilizing Redis XADD/XREADGroups for idempotent task delivery. Designed for horizontal elasticity and sub-50ms inter-service latency overhead.",
-            label: "Throughput & Scalability"
+            label: "Throughput & Scalability",
+            path: "/docs/architecture"
         },
         {
             title: "Behavioral Graph Memory",
             icon: <Zap className="text-blue-400" />,
             content: "Integration of Model Context Protocol (MCP) to facilitate stateful memory management. Transforms transient inference logs into persistent graph nodes for recursive context retrieval.",
-            label: "State Management"
+            label: "State Management",
+            path: "/docs/rlhf"
         },
         {
             title: "Surveilled Refinement",
             icon: <Cpu className="text-blue-400" />,
             content: "Implementation of a local Reward Model (RM) for real-time policy correction. Human-driven delta signals directly influence the preference distribution during the next inference pass.",
-            label: "Control Systems"
+            label: "Control Systems",
+            path: "/docs/rlhf"
         },
         {
             title: "Deterministic Validation",
             icon: <ShieldCheck className="text-blue-400" />,
             content: "Multi-layered consensus engine running semantic Pydantic validation. Ensures all machine-generated tokens adhere to strictly defined JSON schemas and behavioral safety constraints.",
-            label: "Validation Layer"
+            label: "Validation Layer",
+            path: "/docs/architecture"
         },
     ];
 
@@ -223,10 +229,17 @@ export const DocsPage = () => {
                 {/* Grid Navigation */}
                 <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 pt-20">
                     {deepDives.map((item, i) => (
-                        <div key={i} className="group p-8 rounded-3xl border border-slate-900 bg-slate-900/20 hover:bg-blue-500/[0.03] hover:border-blue-500/20 transition-all cursor-pointer flex flex-col">
+                        <div
+                            key={i}
+                            onClick={() => navigate(item.path)}
+                            className="group p-8 rounded-3xl border border-slate-900 bg-slate-900/20 hover:bg-blue-500/[0.03] hover:border-blue-500/20 transition-all cursor-pointer flex flex-col relative"
+                        >
                             <span className="text-[9px] font-mono text-slate-600 uppercase tracking-[0.2em] mb-6">{item.label}</span>
                             <div className="mb-6 opacity-80">{item.icon}</div>
-                            <h3 className="font-bold mb-3 group-hover:text-blue-400 transition-colors uppercase tracking-tight text-xs">{item.title}</h3>
+                            <h3 className="font-bold mb-3 group-hover:text-blue-400 transition-colors uppercase tracking-tight text-xs flex items-center justify-between">
+                                {item.title}
+                                <ArrowUpRight size={12} className="opacity-0 group-hover:opacity-100 transition-opacity" />
+                            </h3>
                             <p className="text-slate-500 text-[10px] leading-relaxed font-light">{item.content}</p>
                         </div>
                     ))}
