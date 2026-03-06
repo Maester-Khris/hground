@@ -156,6 +156,14 @@ export const DocsPage = () => {
                             Our architecture solves the overhead of multi-language AI applications by decoupling state-heavy orchestration from compute-intensive inference. By utilizing a <strong>Shared-Nothing Architecture</strong> across workers, we achieve linear scalability and deterministic resource isolation.
                         </p>
 
+                        <button
+                            onClick={() => navigate("/docs/architecture")}
+                            className="mb-12 flex items-center gap-2 text-blue-400 text-[10px] font-mono uppercase tracking-[0.2em] hover:text-blue-300 transition-colors group"
+                        >
+                            View Architecture Specs
+                            <ArrowUpRight size={12} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                        </button>
+
                         <div className="grid sm:grid-cols-2 gap-4">
                             <div className="p-4 rounded-xl border border-slate-800 bg-slate-900/40">
                                 <div className="text-blue-400 font-mono text-[10px] uppercase mb-2">Network Layer</div>
@@ -200,6 +208,14 @@ export const DocsPage = () => {
                         <p className="text-slate-400 mb-10 leading-relaxed font-light">
                             Intelligence is treated as a continuous variable rather than a static deployment. Our refinement loops facilitate the systematic movement from transient context to deep behavioral memory.
                         </p>
+
+                        <button
+                            onClick={() => navigate("/docs/rlhf")}
+                            className="mb-8 flex items-center gap-2 text-emerald-400 text-[10px] font-mono uppercase tracking-[0.2em] hover:text-emerald-300 transition-colors group"
+                        >
+                            Explore RLHF Evolution
+                            <ArrowUpRight size={12} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+                        </button>
                         <div className="space-y-6">
                             <div className="group relative p-5 bg-slate-900/20 rounded-2xl border border-slate-800/50 hover:bg-slate-900/40 transition-all">
                                 <div className="flex justify-between items-start mb-2">
