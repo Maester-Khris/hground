@@ -9,7 +9,9 @@ from services.inference import InferenceService
 load_dotenv()
 
 # Configuration
-REDIS_URL = os.getenv("REDIS_URL") or "redis://:redispassword123@localhost:6379"
+REDIS_URL = os.getenv("REDIS_URL")
+if not REDIS_URL:
+    raise RuntimeError("REDIS_URL environment variable is required")
 REQ_QUEUE = "queue:requests"
 RES_STREAM = "stream:results"
 
