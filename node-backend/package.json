@@ -7,7 +7,7 @@
 		"test": "vitest ",
 		"dev": "tsx watch src/index.ts",
 		"build": "tsc",
-		"start": "node dist/index.ts",
+		"start": "node dist/index.js",
 		"prisma:migrate": "npx prisma migrate dev --config=./src/prisma.config.ts",
 		"prisma:generate": "npx prisma generate --config=./src/prisma.config.ts",
 		"prisma:seed": "prisma db seed --config=./src/prisma.config.ts"

@@ -3,13 +3,13 @@ import dotenv from "dotenv";
 dotenv.config();
 
 import cors from "cors";
-import type { NextFunction, Request, Response } from "express";
 import express from "express";
 import http from "http";
 import morgan from "morgan";
 import apiRouter from "./api/index.js";
 import { redisConfig } from "./config/redis.js";
 import { corsConfig } from "./config/security.js";
+import { errorHandler } from "./core/errors.js";
 import { redisStream } from "./services/redis-streaming.js";
 import { emitToRoom, initSocketManager } from "./services/socket-manager.js";
 
@@ -28,13 +28,7 @@ app.get("/health", (req, res) => {
 });
 app.use("/api", apiRouter);
 
-// Global Error Handler
-app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-	console.error(err.stack);
-	res
-		.status(500)
-		.json({ error: "Internal Server Error", message: err.message });
-});
+app.use(errorHandler);
 
 // Create the HTTP Server manually
 const httpServer = http.createServer(app);
