@@ -2,6 +2,7 @@
 
 import { randomUUID } from "node:crypto";
 import { Router } from "express";
+import { AppError } from "../../core/errors.js";
 import {
 	isNonEmptyString,
 	isValidRating,
@@ -112,6 +113,7 @@ router.patch(
 // GET /api/chat/history/:userId
 router.get(
 	"/history/:userId",
+	authMiddleware,
 	validate("params", {
 		userId: (v) =>
 			isNonEmptyString(v) ||
@@ -119,6 +121,9 @@ router.get(
 	}),
 	async (req, res, next) => {
 		try {
+			if (req.params.userId !== (req as any).user.id) {
+				throw new AppError("Forbidden", 403);
+			}
 			const userId = req.params.userId as string;
 			const history = await ChatDAO.getConversationsByUser(userId);
 			res.json(history);
