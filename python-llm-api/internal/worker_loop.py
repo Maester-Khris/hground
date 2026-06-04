@@ -74,6 +74,22 @@ async def start_worker_loop(r, inference):
                                 buffer = "" # Clear buffer after push
 
                         # 4. Finalize
+                        if buffer:
+                            await r.xadd(
+                                RES_STREAM,
+                                {
+                                    "correlationId": corr_id,
+                                    "userId": user_id,
+                                    "conversationId": conv_id,
+                                    "roomId": room_id,
+                                    "content": buffer,
+                                    "status": "streaming",
+                                    "isGuest": is_guest,
+                                },
+                                maxlen=1000,
+                                approximate=True
+                            )
+                            buffer = ""
                         await r.xadd(
                             RES_STREAM,
                             {
