@@ -1,0 +1,143 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - fix/deployment
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  node-tests:
+    name: Node.js tests
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_USER: testuser
+          POSTGRES_PASSWORD: testpassword
+          POSTGRES_DB: testdb
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:latest
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: node-backend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: node-backend
+
+      - name: Apply database migrations
+        run: npx prisma migrate deploy --config=./src/prisma.config.ts
+        working-directory: node-backend
+        env:
+          DATABASE_URL: postgresql://testuser:testpassword@localhost:5432/testdb
+
+      - name: Run tests
+        run: npm test
+        working-directory: node-backend
+        env:
+          NODE_ENV: test
+          DATABASE_URL: postgresql://testuser:testpassword@localhost:5432/testdb
+          JWT_SECRET: ci-test-jwt-secret
+          REDIS_URL: redis://localhost:6379
+
+  python-tests:
+    name: Python tests
+    runs-on: ubuntu-latest
+
+    services:
+      redis:
+        image: redis:latest
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+          cache-dependency-path: python-llm-api/requirements.txt
+
+      - name: Install runtime dependencies
+        run: pip install -r requirements.txt
+        working-directory: python-llm-api
+
+      - name: Install test dependencies
+        run: pip install -r requirements-test.txt
+        working-directory: python-llm-api
+
+      - name: Run Python tests
+        run: pytest tests/ -v
+        working-directory: python-llm-api
+        env:
+          REDIS_URL: redis://localhost:6379
+          GROQ_API_KEY: dummy-key-unit-tests-do-not-call-groq
+
+  build-check:
+    name: TypeScript build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: node-backend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: node-backend
+
+      - name: Build
+        run: npm run build
+        working-directory: node-backend
+
+      - name: Verify dist/index.js exists
+        run: |
+          if [ ! -f dist/index.js ]; then
+            echo "dist/index.js not found — start script would fail at runtime"
+            exit 1
+          fi
+          echo "dist/index.js present"
+        working-directory: node-backend
