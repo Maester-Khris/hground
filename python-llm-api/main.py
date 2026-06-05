@@ -6,6 +6,7 @@ import time
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
+from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 import redis.asyncio as redis
 from services.inference import InferenceService
@@ -43,6 +44,19 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="AI Evaluator, Groq Inference Service", lifespan=lifespan)
+
+ALLOWED_ORIGINS = [
+    origin.strip()
+    for origin in os.environ.get("ALLOWED_ORIGINS", "http://localhost:5173").split(",")
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=ALLOWED_ORIGINS,
+    allow_credentials=True,
+    allow_methods=["GET", "POST"],
+    allow_headers=["Content-Type", "Authorization", "X-Request-ID", "If-None-Match"],
+)
 
 # -------------------------- Endpoints ------------------------------
 # 5. Create Rest endpoint: /home, /health, /generate-response
