@@ -1,9 +1,14 @@
 import type { CorsOptions } from "cors";
 
+const clientUrl =
+	process.env.NODE_ENV === "production"
+		? process.env.CLIENT_SERVICE_URL
+		: "http://localhost:5173";
+
 const allowedOrigins = [
-	"http://localhost:5173", // Vite default
+	clientUrl,
 	"http://127.0.0.1:5173",
-];
+].filter(Boolean) as string[];
 
 export const corsConfig: CorsOptions = {
 	origin: (
